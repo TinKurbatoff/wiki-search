@@ -31,7 +31,7 @@ A query to http://dogs.wiki-search.com:
 app = Flask(__name__, host_matching=False)  
 
 
-def ask_wikipedia(search_domain=None, limit=10):
+def ask_wikipedia(search_domain=None, limit=10, debug=False):
     if not search_domain:
         return [], 0
     try:
@@ -39,11 +39,14 @@ def ask_wikipedia(search_domain=None, limit=10):
         # logger.warning(result.text)  # *** DEBUG *** 
         result_dict = result.json()
         if len(result_dict):
-            # logger.info(result_dict)
+            if debug:
+                logger.info(result_dict)
             return result_dict[3], len(result_dict[3])
         return [], 0
     except Exception as e:
         logger.error(f"{e}")
+        if debug:
+            return [f"{e}"], 0
         return [], 0
 
 
@@ -54,7 +57,7 @@ def index(debug, limit):
     limit = request.args.get('limit', "10")  # default value is excessive, but better to stay at the safe side....
     host = request.headers.get('host', "none.domain")  # default value is excessive, but who knows???
     subdomains = host.split(".")
-    d_status = "ON" if debug == "1" else "OFF"
+    d_status = True if debug == "1" else False
     links = []
     result = {"links": links, "status": "Fail", "message": "", "debug": d_status, "response": "0.0000s"}
     http_status = 400
@@ -72,7 +75,7 @@ def index(debug, limit):
         else:
             # Okay, let parse third-level domain
             logger.info(f"serach: {subdomains[0]}")
-            links, a_count = ask_wikipedia(subdomains[0], limit=limit)
+            links, a_count = ask_wikipedia(subdomains[0], limit=limit, debug=d_status)
             result["message"] = f"{a_count} articles found"
             result["links"] = links
             result["status"] = "OK"
@@ -93,7 +96,7 @@ def index(debug, limit):
 ## 404 error handler
 @app.errorhandler(404)
 def page_not_found(error):
-    result = {"links": "not found"}
+    result = {"links": [], "status": "Fail", "message": "404 error", "debug": "", "response": "0.0000s"}
     return jsonify(result), 404
 
 
