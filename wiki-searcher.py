@@ -36,7 +36,7 @@ def ask_wikipedia(search_domain=None, limit=10):
         return [], 0
     try:
         result = requests.get(WIKI_URL + f"&limit={limit}&search={search_domain}")
-        #  logger.warning(result.text)  # *** DEBUG *** 
+        # logger.warning(result.text)  # *** DEBUG *** 
         result_dict = result.json()
         if len(result_dict):
             # logger.info(result_dict)
@@ -47,11 +47,12 @@ def ask_wikipedia(search_domain=None, limit=10):
         return [], 0
 
 
-@app.route('/', methods=['GET'], defaults={'debug': '1', 'limit': 10})
+@app.route('/', methods=['GET'], defaults={'debug': '1', 'limit': '10'})
 def index(debug, limit):
     start_time = time.time()
-    debug = request.args.get('debug', "0")
-    host = request.headers.get('host', "none.domain")  # default value is exessive, but who knows???
+    debug = request.args.get('debug', "0")  # default value is excessive, but better to stay at the safe side....
+    limit = request.args.get('limit', "10")  # default value is excessive, but better to stay at the safe side....
+    host = request.headers.get('host', "none.domain")  # default value is excessive, but who knows???
     subdomains = host.split(".")
     d_status = "ON" if debug == "1" else "OFF"
     links = []
@@ -70,6 +71,7 @@ def index(debug, limit):
             pass       
         else:
             # Okay, let parse third-level domain
+            logger.info(f"serach: {subdomains[0]}")
             links, a_count = ask_wikipedia(subdomains[0], limit=limit)
             result["message"] = f"{a_count} articles found"
             result["links"] = links
@@ -78,13 +80,13 @@ def index(debug, limit):
 
         # finally response with the result...
         end_time = time.time()
-        result["response"] = f"{end_time-start_time:0.4f}s"
+        result["response"] = f"{end_time - start_time:0.4f}s"
         return jsonify(result), http_status
     except Exception as e:
         end_time = time.time()
         result.update(dict(message=f"{e}",
                            status="Fail",
-                           response=f"{end_time-start_time:0.4f}s",))
+                           response=f"{end_time - start_time:0.4f}s",))
         return jsonify(result), 500
 
 
