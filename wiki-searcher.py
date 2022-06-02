@@ -8,8 +8,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&search=zyz&limit=1&namespace=0&format=jsonfm"
-WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=jsonfm"
+WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&search=zyz&limit=1&namespace=0&format=json"
+WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json"
 
 """
 A query to http://dogs.wiki-search.com:
@@ -31,23 +31,24 @@ A query to http://dogs.wiki-search.com:
 app = Flask(__name__, host_matching=False)  
 
 
-def ask_wikipedia(search_domain=None):
+def ask_wikipedia(search_domain=None, limit=10):
     if not search_domain:
         return [], 0
     try:
-        result = requests.get(WIKI_URL + f"&search={search_domain}")
+        result = requests.get(WIKI_URL + f"&limit={limit}&search={search_domain}")
+        #  logger.warning(result.text)  # *** DEBUG *** 
         result_dict = result.json()
         if len(result_dict):
-            logger.info(result_dict)
-            pass
+            # logger.info(result_dict)
+            return result_dict[3], len(result_dict[3])
         return [], 0
     except Exception as e:
         logger.error(f"{e}")
         return [], 0
 
 
-@app.route('/', methods=['GET'], defaults={'debug': '1'})
-def index(debug):
+@app.route('/', methods=['GET'], defaults={'debug': '1', 'limit': 10})
+def index(debug, limit):
     start_time = time.time()
     debug = request.args.get('debug', "0")
     host = request.headers.get('host', "none.domain")  # default value is exessive, but who knows???
@@ -69,9 +70,10 @@ def index(debug):
             pass       
         else:
             # Okay, let parse third-level domain
-            links, a_count = ask_wikipedia(subdomains[0])
+            links, a_count = ask_wikipedia(subdomains[0], limit=limit)
             result["message"] = f"{a_count} articles found"
             result["links"] = links
+            result["status"] = "OK"
             http_status = 200
 
         # finally response with the result...

@@ -10,13 +10,15 @@ HEADERS_TESTS = {"——    NO HOST ERROR  ——": {},
                  "—— Malformed domain ERROR ——": {"Host": "bar.com.wiki-search"},
                  }
 
-HOSTS_TESTS = {"city.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found"},
-
+HOSTS_TESTS = {"city.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
+               "dog.wiki-search.com": {"links": [], "code": 200, "message": "2 articles found", "limit": "&limit=2"},
+               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": "&limit=10"},
+               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "100 articles found", "limit": "&limit=100"},
                }
                  
 headers = {}
 PORT = 5000
-URL = f"http://localhost:{PORT}"
+URL = f"http://localhost:{PORT}/"
 
 try:
     print(f"—— Test HTTP connection to server: {URL}  ——")
@@ -38,7 +40,8 @@ if 1:
     for location in HOSTS_TESTS.keys():
         print(f"TEST: {location}")
         headers["Host"] = location  # HOSTS_TESTS[location] 
-        result = requests.get(URL, headers=headers)
+        limit = HOSTS_TESTS[location]["limit"] if HOSTS_TESTS[location]["limit"] else ""
+        result = requests.get(URL + limit, headers=headers)
         assert result.status_code == HOSTS_TESTS[location]["code"]
         response_json = result.json()
         print(response_json)
