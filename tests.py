@@ -5,13 +5,21 @@ HEADERS_TESTS = {"——    NO HOST header ——": {},
                  "—— Wrong HOST header ——": {"Host": "foo-bar"},
                  }
 
-HOSTS_TESTS = {"city.local.host": [],
+HOSTS_TESTS = {"city.local.host": {"links": [], "code": 200},
 
                }
                  
 headers = {}
-URL = "http://localhost:5000"
+PORT = 5000
+URL = f"http://localhost:{PORT}"
 
+try:
+    print(f"—— Test HTTP connection to server: {URL}  ——")
+    requests.get(URL)
+except Exception as e:
+    print(f"ERROR: {e}")
+    exit()
+print("OK!")
 
 for header in HEADERS_TESTS.keys():
     print(header)
@@ -22,9 +30,10 @@ for header in HEADERS_TESTS.keys():
 
 for location in HOSTS_TESTS.keys():
     print(f"TEST: {location}")
-    headers["Host"] = location # HOSTS_TESTS[location] 
+    headers["Host"] = location  # HOSTS_TESTS[location] 
     result = requests.get(URL, headers=headers)
-    print(dir(result))
+    assert result.status_code == HOSTS_TESTS[location]["code"]
+    print(result.json())
     print("OK!")
 
 
