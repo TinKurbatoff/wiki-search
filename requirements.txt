@@ -1,0 +1,2 @@
+# Flask is REALLY required...sorry.
+flask>=1.1.0
