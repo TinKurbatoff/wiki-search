@@ -4,6 +4,12 @@ from flask import request
 from flask.json import jsonify  # I know that since Flask 1.1.0 it is not required
 import requests
 import time
+import logging
+
+logger = logging.getLogger(__name__)
+
+WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&search=zyz&limit=1&namespace=0&format=jsonfm"
+WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=jsonfm"
 
 """
 A query to http://dogs.wiki-search.com:
@@ -22,7 +28,22 @@ A query to http://dogs.wiki-search.com:
 }
 """
 
-app = Flask(__name__, host_matching=False) # , static_host=p("pinetree.com"))
+app = Flask(__name__, host_matching=False)  
+
+
+def ask_wikipedia(search_domain=None):
+    if not search_domain:
+        return [], 0
+    try:
+        result = requests.get(WIKI_URL + f"&search={search_domain}")
+        result_dict = result.json()
+        if len(result_dict):
+            logger.info(result_dict)
+            pass
+        return [], 0
+    except Exception as e:
+        logger.error(f"{e}")
+        return [], 0
 
 
 @app.route('/', methods=['GET'], defaults={'debug': '1'})
@@ -35,14 +56,21 @@ def index(debug):
     links = []
     result = {"links": links, "status": "Fail", "message": "", "debug": d_status, "response": "0.0000s"}
     http_status = 400
+    a_count = 0 
     try:
-        if "wiki-search" not in subdomains:
-            result["status"] = "Fail"
-            result["message"] = "Wrong host name!"
-            http_status = 400
+        result["message"] = "Wrong host name!"
+        if len(subdomains) != 3:
+            pass
+        elif ("wiki-search" != subdomains[1]):
+            pass
+        elif ("com" != subdomains[2]):
+            pass
+        elif not len(subdomains[0]):
+            pass       
         else:
             # Okay, let parse third-level domain
-            links = subdomains
+            links, a_count = ask_wikipedia(subdomains[0])
+            result["message"] = f"{a_count} articles found"
             result["links"] = links
             http_status = 200
 
@@ -58,6 +86,7 @@ def index(debug):
         return jsonify(result), 500
 
 
+## 404 error handler
 @app.errorhandler(404)
 def page_not_found(error):
     result = {"links": "not found"}
