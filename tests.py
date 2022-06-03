@@ -10,11 +10,13 @@ HEADERS_TESTS = {"——    NO HOST ERROR  ——": {},
                  "—— Malformed domain ERROR ——": {"Host": "bar.com.wiki-search"},
                  }
 
+# NOTE: If same location is required, but test is different — add a space in the end of the location url 
 HOSTS_TESTS = {"Yulia.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
                "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=2"},
-               "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=20"},
+               "dog.wiki-search.com ": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=20"},
                "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": "?limit=10"},  
-               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "101 articles found", "limit": "?limit=101"},  
+               "ordinary.wiki-search.com ": {"links": [], "code": 200, "message": "101 articles found", "limit": "?limit=101"},  
+               "ordinary.wiki-search.com  ": {"links": [], "code": 200, "message": "128 articles found", "limit": "?limit=150"},  
                "skdjhfk.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "skdj-dog.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "boot-strap.wiki-search.com": {"links": [], "code": 200, "message": "11 articles found", "limit": "?limit=11"},
@@ -55,7 +57,7 @@ try:
 
     for location in HOSTS_TESTS.keys():
         print(f"\n✨✨✨ TEST: `{location}`")
-        headers["Host"] = location  # HOSTS_TESTS[location] 
+        headers["Host"] = location.strip()  # HOSTS_TESTS[location] 
         limit = HOSTS_TESTS[location]["limit"] if HOSTS_TESTS[location]["limit"] else ""
         result = requests.get(URL + limit, headers=headers)
         
@@ -75,5 +77,8 @@ try:
         # assert response_json["links"] == HOSTS_TESTS[location]["links"]  # *** DISABLED INTENTIONALLY!!! ***
         print("⏭ ...check links is skipped")
         # print("✅ OK!")
+
+    # All tests passed
+    print("\n🚼 HOORRAY! All tests passed! 🚼")
 except Exception as e:
     print(" — 🆘 FAIL!")
