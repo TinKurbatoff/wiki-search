@@ -10,7 +10,7 @@ HEADERS_TESTS = {"——    NO HOST ERROR  ——": {},
                  "—— Malformed domain ERROR ——": {"Host": "bar.com.wiki-search"},
                  }
 
-# NOTE: If same location is required, but test is different — add a space in the end of the location url 
+# NOTE: If the same location is required, but test is different — add a space in the end of the location url 
 HOSTS_TESTS = {"Yulia.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
                "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=2"},
                "dog.wiki-search.com ": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=20"},
