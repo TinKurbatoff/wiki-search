@@ -10,14 +10,20 @@ HEADERS_TESTS = {"——    NO HOST ERROR  ——": {},
                  "—— Malformed domain ERROR ——": {"Host": "bar.com.wiki-search"},
                  }
 
-HOSTS_TESTS = {"city.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
+HOSTS_TESTS = {"Yulia.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
                "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=2"},
                "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=20"},
                "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": "?limit=10"},  
-               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "100 articles found", "limit": "?limit=100"},  
+               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "101 articles found", "limit": "?limit=101"},  
                "skdjhfk.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "skdj-dog.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "boot-strap.wiki-search.com": {"links": [], "code": 200, "message": "11 articles found", "limit": "?limit=11"},
+               "City.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=12"},
+               "city.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=12"},
+               "ciTy.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=12"},
+               "citie.wiki-search.com": {"links": [], "code": 200, "message": "3 articles found", "limit": "?limit=3"},
+               "nuclear_weapon.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=3"},
+               "nuclear_weopon.wiki-search.com": {"links": [], "code": 200, "message": "3 articles found", "limit": "?limit=3"},
                }
                  
 headers = {}
@@ -47,7 +53,7 @@ try:
         print(" — ✅ OK!")
 
     for location in HOSTS_TESTS.keys():
-        print(f"TEST: {location}")
+        print(f"✨✨✨ TEST: `{location}`")
         headers["Host"] = location  # HOSTS_TESTS[location] 
         limit = HOSTS_TESTS[location]["limit"] if HOSTS_TESTS[location]["limit"] else ""
         result = requests.get(URL + limit, headers=headers)

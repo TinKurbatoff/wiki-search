@@ -43,7 +43,8 @@ def ask_wikipedia(search_domain=None, limit=10, debug=False):
         if len(result_dict):
             if debug:
                 logger.info(result_dict)
-            if result_dict[1][0] == search_domain:
+            print(f'🌈 {result_dict[1][0]} == {search_domain}')
+            if result_dict[1][0].replace(" ", "_").lower() == search_domain.lower():
                 return result_dict[3][0], 1
             else:
                 return result_dict[3], len(result_dict[3])
