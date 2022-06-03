@@ -67,5 +67,8 @@ try:
         assert response_json["message"] == HOSTS_TESTS[location]["message"]
         print(f'links {len(response_json["links"])} count')
         print("✅ OK!")
+        print(f'Check links {response_json["links"]} ')
+        assert response_json["links"] == HOSTS_TESTS[location]["links"]
+        print("✅ OK!")
 except Exception as e:
     print(" — 🆘 FAIL!")
