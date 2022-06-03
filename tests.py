@@ -47,10 +47,10 @@ try:
         result = requests.get(URL, headers=HEADERS_TESTS[header])
         print(f'status code is {expected_code}', end="")
         assert result.status_code == expected_code
-        print(" — ✅ OK!")
-        print(f'Message is {expect_message}', end="")
+        print(" — OK!")
+        print(f'Message is `{expect_message}`', end="")
         assert result.json()['message'] == expect_message
-        print(" — ✅ OK!")
+        print(" — OK!")
 
     for location in HOSTS_TESTS.keys():
         print(f"✨✨✨ TEST: `{location}`")
@@ -68,5 +68,4 @@ try:
         print(f'links {len(response_json["links"])} count')
         print("✅ OK!")
 except Exception as e:
-    print("🆘 FAIL!")
-
+    print(" — 🆘 FAIL!")
