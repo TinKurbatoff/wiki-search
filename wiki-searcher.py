@@ -8,9 +8,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&search=zyz&limit=1&namespace=0&format=json"
-WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json"
-
+# WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&search=zyz&limit=1&namespace=0&format=json"
+# WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json"
+# WIKI_TITLE_URL = "https://en.wikipedia.org/w/api.php?action=query&list=prefixsearch&format=json"
+WIKI_URL = "https://en.wikipedia.org/w/api.php?action=opensearch&list=prefixsearch&format=json"
 """
 A query to http://dogs.wiki-search.com:
 { 
@@ -35,18 +36,23 @@ def ask_wikipedia(search_domain=None, limit=10, debug=False):
     if not search_domain:
         return [], 0
     try:
-        result = requests.get(WIKI_URL + f"&limit={limit}&search={search_domain}")
+        result = requests.get(WIKI_URL + f"&limit={limit}&search=%22{search_domain}%22")
+        # result_title = requests.get(WIKI_URL + f"&limit=2&pssearch=%22{search_domain}%22")
         # logger.warning(result.text)  # *** DEBUG *** 
         result_dict = result.json()
         if len(result_dict):
             if debug:
                 logger.info(result_dict)
-            return result_dict[3], len(result_dict[3])
+            if result_dict[1][0] == search_domain:
+                return result_dict[3][0], 1
+            else:
+                return result_dict[3], len(result_dict[3])
         return [], 0
     except Exception as e:
-        logger.error(f"{e}")
+        error_text = f"{e}"
+        logger.error(error_text)
         if debug:
-            return [f"{e}"], 0
+            return [error_text], 0
         return [], 0
 
 
@@ -56,6 +62,7 @@ def index(debug, limit):
     debug = request.args.get('debug', "0")  # default value is excessive, but better to stay at the safe side....
     limit = request.args.get('limit', "10")  # default value is excessive, but better to stay at the safe side....
     host = request.headers.get('host', "none.domain")  # default value is excessive, but who knows???
+    print(host)
     subdomains = host.split(".")
     d_status = True if debug == "1" else False
     links = []

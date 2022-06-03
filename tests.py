@@ -11,9 +11,10 @@ HEADERS_TESTS = {"——    NO HOST ERROR  ——": {},
                  }
 
 HOSTS_TESTS = {"city.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": None},
-               "dog.wiki-search.com": {"links": [], "code": 200, "message": "2 articles found", "limit": "?limit=2"},
-               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": "?limit=10"},
-               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "100 articles found", "limit": "?limit=100"},
+               "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=2"},
+               "dog.wiki-search.com": {"links": [], "code": 200, "message": "1 articles found", "limit": "?limit=20"},
+               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "10 articles found", "limit": "?limit=10"},  
+               "ordinary.wiki-search.com": {"links": [], "code": 200, "message": "100 articles found", "limit": "?limit=100"},  
                "skdjhfk.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "skdj-dog.wiki-search.com": {"links": [], "code": 200, "message": "0 articles found", "limit": "?limit=10"},
                "boot-strap.wiki-search.com": {"links": [], "code": 200, "message": "11 articles found", "limit": "?limit=11"},
@@ -31,27 +32,35 @@ except Exception as e:
     exit()
 print("✅ OK!")
 
-# try:
-if 1:
+try:
+# if 1:
+    expected_code = 400
+    expect_message = "Wrong host name!"
     for header in HEADERS_TESTS.keys():
         print(header)
         result = requests.get(URL, headers=HEADERS_TESTS[header])
-        assert result.status_code == 400
-        assert result.json()['message'] == "Wrong host name!"
-        print("✅ OK!")
+        print(f'status code is {expected_code}', end="")
+        assert result.status_code == expected_code
+        print(" — ✅ OK!")
+        print(f'Message is {expect_message}', end="")
+        assert result.json()['message'] == expect_message
+        print(" — ✅ OK!")
 
     for location in HOSTS_TESTS.keys():
         print(f"TEST: {location}")
         headers["Host"] = location  # HOSTS_TESTS[location] 
         limit = HOSTS_TESTS[location]["limit"] if HOSTS_TESTS[location]["limit"] else ""
         result = requests.get(URL + limit, headers=headers)
+        print(f'status code is {HOSTS_TESTS[location]["code"]}')
         assert result.status_code == HOSTS_TESTS[location]["code"]
+        print("✅ OK!")
         response_json = result.json()
-        # print(response_json)  # ** DEBUG **
+        print(response_json)  # ** DEBUG **
         # print(response_json['message'])  # ** DEBUG **
+        print(f'Assert response: `{response_json["message"]}` == `{HOSTS_TESTS[location]["message"]}`')
         assert response_json["message"] == HOSTS_TESTS[location]["message"]
         print(f'links {len(response_json["links"])} count')
         print("✅ OK!")
-# except Exception as e:
-#     print("🆘 FAIL!")
+except Exception as e:
+    print("🆘 FAIL!")
 
